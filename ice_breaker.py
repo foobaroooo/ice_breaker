@@ -1,51 +1,42 @@
-from typing import Tuple
-from agents.linkedin_lookup_agent import lookup as linkedin_lookup_agent
-from agents.twitter_lookup_agent import lookup as twitter_lookup_agent
-from chains.custom_chains import (
-    get_summary_chain,
-    get_interests_chain,
-    get_ice_breaker_chain,
-)
-from third_parties.linkedin import scrape_linkedin_profile
-from third_parties.twitter import scrape_user_tweets, scrape_user_tweets_mock
-from output_parsers import (
-    Summary,
-    IceBreaker,
-    TopicOfInterest,
-)
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_openai import ChatOpenAI
+from langchain_community.chat_models import ChatOllama
+from dotenv import load_dotenv
+import requests
+import os
 
+from third_parties.linkedin import scrap_linkedin_profile
 
-def ice_break_with(
-    name: str,
-) -> Tuple[Summary, TopicOfInterest, IceBreaker, str]:
-    linkedin_username = linkedin_lookup_agent(name=name)
-    linkedin_data = scrape_linkedin_profile(linkedin_profile_url=linkedin_username)
-
-    twitter_username = twitter_lookup_agent(name=name)
-    tweets = scrape_user_tweets_mock(username=twitter_username)
-
-    summary_chain = get_summary_chain()
-    summary_and_facts: Summary = summary_chain.invoke(
-        input={"information": linkedin_data, "twitter_posts": tweets},
-    )
-
-    interests_chain = get_interests_chain()
-    interests: TopicOfInterest = interests_chain.invoke(
-        input={"information": linkedin_data, "twitter_posts": tweets}
-    )
-
-    ice_breaker_chain = get_ice_breaker_chain()
-    ice_breakers: IceBreaker = ice_breaker_chain.invoke(
-        input={"information": linkedin_data, "twitter_posts": tweets}
-    )
-
-    return (
-        summary_and_facts,
-        interests,
-        ice_breakers,
-        linkedin_data.get("photoUrl"),
-    )
+load_dotenv()
 
 
 if __name__ == "__main__":
-    pass
+    print("Hello foo")
+
+    summary_template = """
+        giving the info provided below:
+        {information}    
+        I want to create:
+        1. summary
+        2. create a joke
+        """
+
+    summary_prompt_template = PromptTemplate(
+        input_variables=["information"],
+        template=summary_template
+    )
+
+    # llm = ChatOpenAI(temperature=0, model="gpt-4o-mini", api_key=os.getenv("OPENAI_API_KEY"))
+
+    llm = ChatOllama(model="llama3.2")
+
+    # chain = summary_prompt_template | llm | StrOutputParser
+    chain = summary_prompt_template | llm
+
+    linkedin_data = scrap_linkedin_profile("https://www.linkedin.com/in/michael-huang-006a1017/", True)
+
+    res = chain.invoke(input={"information": linkedin_data})
+
+    print(res)
+
