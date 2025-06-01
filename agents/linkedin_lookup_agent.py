@@ -1,20 +1,27 @@
 import os
 from dotenv import load_dotenv
-
-from tools.tools import get_profile_url_tavily
-
-load_dotenv()
 from langchain_core.prompts import PromptTemplate
 from langchain_core.tools import Tool
 from langchain_openai import ChatOpenAI
 from langchain.agents import create_react_agent, AgentExecutor
 from langchain import hub
 
+# this 3 lines fixes ModuleNotFoundError: No module named 'tools'
+# TODO - investigate why this is needed. Maybe a PYTHONPATH issue?
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from tools.tools import get_profile_url_tavily
+
+load_dotenv()
+
 
 def lookup(name: str) -> str:
     llm = ChatOpenAI(
         temperature=0,
-        model_name="gpt-4o-mini"
+        model_name="gpt-4o-mini",
+        openai_api_key=os.environ["OPENAI_API_KEY"],
     )
 
     # prompt template with a clear "outpout indicator"
@@ -30,7 +37,7 @@ def lookup(name: str) -> str:
         Tool(
             name="Crawl LinkedIn person profile",
             func=get_profile_url_tavily,
-            description="Get the Url to the LinkedIn profile page given a person name"
+            description="Get the Url to the LinkedIn profile page to a person by their full name",
         )
     ]
 
@@ -48,4 +55,4 @@ def lookup(name: str) -> str:
 
 
 if __name__ == "__main__":
-    linkedin_url = lookup(name="Michael Huang")
+    linkedin_url = lookup(name="Michael Huang loan officer")
