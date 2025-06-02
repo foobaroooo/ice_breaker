@@ -9,7 +9,7 @@ def scrap_linkedin_profile(linkedin_profile_url: str, mock: bool = False):
     """scrap linked profile via url"""
 
     if mock:
-        linkedin_profile_url = "https://gist.githubusercontent.com/foobaroooo/ed39eb73ab4e7ca6fd8b81c24ba01b69/raw/82bad38c70291f5cd68758901e2a664087c0b91b/langchain_linkedin_scraping.json"
+        linkedin_profile_url = "https://gist.githubusercontent.com/foobaroooo/ed39eb73ab4e7ca6fd8b81c24ba01b69/raw/bbfec9d77650db4ea5ca1779f8e859fe53b3c4d4/langchain_linkedin_scraping.json"
         response = requests.get(
             linkedin_profile_url,
             timeout=10)
@@ -26,6 +26,7 @@ def scrap_linkedin_profile(linkedin_profile_url: str, mock: bool = False):
             timeout=10,
         )
 
+
     data = response.json().get("person")
 
     # remove blank and certifications data (also blank)
@@ -40,5 +41,5 @@ def scrap_linkedin_profile(linkedin_profile_url: str, mock: bool = False):
 
 if __name__ == "__main__":
     print(
-        scrap_linkedin_profile("https://www.linkedin.com/in/michael-huang-006a1017/", True)
+        scrap_linkedin_profile("https://www.linkedin.com/in/andrewyng/", True)
     )
