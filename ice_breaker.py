@@ -1,3 +1,4 @@
+from typing import Tuple
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
@@ -5,12 +6,14 @@ from langchain_community.chat_models import ChatOllama
 from dotenv import load_dotenv
 import requests
 import os
+from output_parsers import Summary, summary_parser
+
 
 from third_parties.linkedin import scrap_linkedin_profile
 from agents.linkedin_lookup_agent import lookup as linkedin_lookup_agent
 
 
-def ice_breaker_with(name: str) -> str:
+def ice_breaker_with(name: str) -> Tuple[Summary, str]:
 
     # get the linkedin profile url
     linkedin_username_url = linkedin_lookup_agent(name=name)
@@ -39,14 +42,14 @@ def ice_breaker_with(name: str) -> str:
     # chain = summary_prompt_template | llm | StrOutputParser
     chain = summary_prompt_template | llm
 
-    res = chain.invoke(input={"information": linkedin_data})
+    res:Summary = chain.invoke(input={"information": linkedin_data})
 
-    print(res)
-
+    # print(res)
+    return res, linkedin_data.get("photoUrl")
 
 if __name__ == "__main__":
     load_dotenv()
 
     print("Hello ICE BREAKER")
     
-    ice_breaker_with(name="Andrew Ng - AI Pioneer")
+    ice_breaker_with(name="Richard Chen ")

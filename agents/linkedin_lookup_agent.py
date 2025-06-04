@@ -55,4 +55,4 @@ def lookup(name: str) -> str:
 
 
 if __name__ == "__main__":
-    linkedin_url = lookup(name="Andrew Ng - AI Pioneer")
+    linkedin_url = lookup(name="Andrew Ng AI Pioneer, LinkedIn")
