@@ -12,10 +12,10 @@ langchain = "*"
 langchain-openai = "*"
 langchain-community = "*"
 langchainhub = "*"
-black = "*"
 python-dotenv = "*"
 typing-extensions = "*"
 langchain-ollama = "*"
+black = "*"
 
 [dev-packages]
 
